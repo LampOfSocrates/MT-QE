@@ -3,3 +3,4 @@ __pycache__/
 gensim-data/*
 nltk_data/*
 
+.coverage

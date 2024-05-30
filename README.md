@@ -12,3 +12,8 @@ python -m unittest discover -s tests
 or
 
 python tests/test_text_graph_dataset.py
+
+# Run tests with coverage
+coverage run -m unittest discover -s tests
+coverage report
+coverage html
