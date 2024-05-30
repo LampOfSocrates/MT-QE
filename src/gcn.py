@@ -1,4 +1,5 @@
 import torch.nn.functional as F
+import pytorch_lightning as pl
 
 class GCN(pl.LightningModule):
     def __init__(self, in_channels, hidden_channels, out_channels, lr=0.01):
