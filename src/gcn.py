@@ -1,5 +1,6 @@
 import torch.nn.functional as F
 import pytorch_lightning as pl
+from torch_geometric.nn import GCNConv
 
 class GCN(pl.LightningModule):
     def __init__(self, in_channels, hidden_channels, out_channels, lr=0.01):

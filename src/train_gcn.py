@@ -9,7 +9,8 @@ import gensim.downloader as api
 from embedders import GloveEmbedder
 from text_graph_dataset import GraphDataModule
 from gcn import GCN
-
+from pytorch_lightning.loggers import WandbLogger
+import wandb
 
 # Example sentences
 sentences = [
