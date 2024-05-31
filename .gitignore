@@ -4,5 +4,6 @@ gensim-data/*
 nltk_data/*
 events.out*
 lightning_logs/*
+checkpoints/*
 wandb/
 .coverage
