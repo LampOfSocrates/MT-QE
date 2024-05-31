@@ -7,7 +7,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 import gensim.downloader as api
 from embedders import GloveEmbedder
-from text_graph_dataset import GraphDataModule
+from text_graph_dataset import GraphDataModule, TextGraphDataset
 from gcn import GCN
 from pytorch_lightning.loggers import WandbLogger
 import wandb
@@ -34,12 +34,14 @@ checkpoint_callback = ModelCheckpoint(
 )
 # Initialize the WandbLogger
 wandb_logger = WandbLogger(project='gcn-text-embeddings')
-# Initialize the trainer with the checkpoint callback
-trainer = pl.Trainer(max_epochs=10, callbacks=[checkpoint_callback])
+
+# Initialize the trainer with the checkpoint callback and WandbLogger
+trainer = pl.Trainer(max_epochs=10, callbacks=[checkpoint_callback], logger=wandb_logger)
 
 # Train the model
 trainer.fit(model, data_module)
 
+#########################################################
 # Load the trained model from the checkpoint
 checkpoint_path = checkpoint_callback.best_model_path  # Use the best model path
 model = GCN.load_from_checkpoint(checkpoint_path, in_channels=300, hidden_channels=128, out_channels=64)

@@ -2,5 +2,7 @@ __pycache__/
 .sacrebleu/*
 gensim-data/*
 nltk_data/*
-
+events.out*
+lightning_logs/*
+wandb/
 .coverage
