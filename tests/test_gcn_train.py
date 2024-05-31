@@ -2,7 +2,7 @@ import unittest
 import torch
 import numpy as np
 from src.embedders import GloveEmbedder
-from graph_datamodule import GraphDataModule
+from text_graph_dataset import GraphDataModule
 
 class TestTrainGCN(unittest.TestCase):
     @classmethod

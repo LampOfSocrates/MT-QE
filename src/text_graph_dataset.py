@@ -2,7 +2,7 @@ import torch
 from torch_geometric.data import Data, DataLoader
 from nltk.tokenize import word_tokenize
 import pytorch_lightning as pl
-from embedders import GloveEmbedder
+from src.embedders import GloveEmbedder
 
 class TextGraphDataset:
     def __init__(self, sentences, embedder=GloveEmbedder()):
