@@ -1,7 +1,7 @@
 import unittest
 import torch
 import numpy as np
-from src.embedders import GloveEmbedder
+from embedder_glove import GloveEmbedder
 
 class TestGloveEmbedder(unittest.TestCase):
     @classmethod

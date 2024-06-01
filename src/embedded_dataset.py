@@ -4,7 +4,7 @@ from torch.utils.data import Dataset, DataLoader
 import pytorch_lightning as pl
 from sentence_transformers import SentenceTransformer
 from embedders import *
-from embedder_wordnet import WordNetSentenceEmbedder
+from embedder_wordnet import WordNetGloveEmbedder
 import pandas as pd
 from torch.utils.data import Dataset
 
@@ -126,7 +126,7 @@ def main():
     display_stats(data)
     # Create encoders
     transformer_embedder = TransformerEmbedder()
-    wordnet_embeder = WordNetSentenceEmbedder()
+    wordnet_embeder = WordNetGloveEmbedder()
     #word2vec_encoder = Word2VecEncoder()
     #fasttext_encoder = FastTextEncoder()
     #use_encoder = USEEncoder()

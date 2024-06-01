@@ -6,8 +6,8 @@ import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 import gensim.downloader as api
-from embedders import GloveEmbedder
-from text_graph_dataset import GraphDataModule, TextGraphDataset
+from embedder_glove import GloveEmbedder
+from text_graph_dataset import GraphDataModule, Sentence2Graph
 from gcn import GCN
 from pytorch_lightning.loggers import WandbLogger
 import wandb
@@ -53,7 +53,7 @@ new_sentences = [
 ]
 
 # Initialize the TextGraphDataset for the new sentences
-dataset = TextGraphDataset(new_sentences)
+dataset = Sentence2Graph(new_sentences)
 graph_data_list = dataset.get_data()
 
 # Generate embeddings for new sentences

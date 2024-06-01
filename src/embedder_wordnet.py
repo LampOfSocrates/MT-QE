@@ -44,7 +44,8 @@ class MultilingualWordNetEncoder:
         synset_features = self.get_synset_features(word)
         return synset_features
 
-class WordNetSentenceEmbedder:
+# TODO use the GloveEmbedder class
+class WordNetGloveEmbedder:
     def __init__(self, language='eng', embedding_model_name='glove-wiki-gigaword-300'):
         self.encoder = MultilingualWordNetEncoder(language)
         self.embedding_model = api.load(embedding_model_name)

@@ -2,7 +2,7 @@ import unittest
 import torch
 from nltk.tokenize import word_tokenize
 from torch_geometric.data import Data
-from src.text_graph_dataset import TextGraphDataset  # Adjust this import based on your file structure
+from src.text_graph_dataset import Sentence2Graph  # Adjust this import based on your file structure
 
 class TestTextGraphDataset(unittest.TestCase):
     
@@ -12,11 +12,11 @@ class TestTextGraphDataset(unittest.TestCase):
             "The quick brown fox jumps over the lazy dog",
             "The lazy dog lies down"
         ]
-        cls.dataset = TextGraphDataset(cls.sentences)
+        cls.dataset = Sentence2Graph(cls.sentences)
 
     def test_initialization(self):
         self.assertEqual(len(self.dataset.sentences), 2)
-        self.assertIsInstance(self.dataset.glove_embedder, GloveEmbedder)
+        self.assertIsInstance(self.dataset.embedder, GloveEmbedder)
 
     def test_word_to_node_features(self):
         known_word = "quick"

@@ -1,13 +1,13 @@
 import unittest
 import torch
 import numpy as np
-from src.embedders import GloveEmbedder
+from embedder_glove import GloveEmbedder
 from text_graph_dataset import GraphDataModule
 
 class TestTrainGCN(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.embedder = GloveEmbedder()
+        cls.embedder = GloveEmbedder(model_name= 'glove-wiki-gigaword-300'   )
 
     def test_gcn_training_non_empty_sentence(self):
         sentences = [

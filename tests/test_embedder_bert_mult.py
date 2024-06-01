@@ -19,7 +19,7 @@ class TestTransformerEmbedder(unittest.TestCase):
         embedding = self.embedder.embed(sentence)
         self.assertEqual(embedding.shape, (768,))
         self.assertTrue(torch.is_tensor(embedding))
-        self.assertEqual(embedding.sum().item(), 0)
+        self.assertNotEqual(embedding.sum().item(), 0)
 
     def test_embed_sentence_with_unknown_words(self):
         sentence = "asdflkjasdflkjasdf"

@@ -1,12 +1,12 @@
 import unittest
 import numpy as np
 from nltk.tokenize import word_tokenize
-from src.embedder_wordnet import WordNetSentenceEmbedder  # Adjust this import as necessary based on your file structure
+from src.embedder_wordnet import WordNetGloveEmbedder  # Adjust this import as necessary based on your file structure
 
-class TestWordNetSentenceEmbedder(unittest.TestCase):
+class TestWordNetGloveEmbedder(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.embedder = WordNetSentenceEmbedder(language='eng', embedding_model_name='glove-wiki-gigaword-300')
+        cls.embedder = WordNetGloveEmbedder(language='eng', embedding_model_name='glove-wiki-gigaword-300')
 
     def test_embed_non_empty_sentence(self):
         sentence = "The quick brown fox jumps over the lazy dog"
