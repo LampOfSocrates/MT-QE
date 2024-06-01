@@ -26,6 +26,7 @@ python-dotenv==1.0.1
 pytorch-lightning==2.2.5
 sacrebleu==2.4.2
 sentence-transformers==3.0.0
+scipy==1.11.4
 sphinx-markdown-tables==0.0.17
 tensorflow-hub==0.16.1
 torch-geometric==2.5.3
