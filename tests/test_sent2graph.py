@@ -67,8 +67,7 @@ class TestSentence2Graph(unittest.TestCase):
         cls.sent2graph = Sentence2Graph(cls.sentences, embed_dim=GLOVE_SIZE)
 
     @patch('spacy.load')
-    @patch('gensim.models.KeyedVectors.load_word2vec_format')
-    def test_print_graph(self, mock_glove_load , mock_spacy_load):
+    def test_print_graph(self,  mock_spacy_load):
         logging.info("Starting test")
         sentence = "The quick brown fox jumps over the lazy dog."
 

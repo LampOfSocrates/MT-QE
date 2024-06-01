@@ -22,6 +22,7 @@ python -m unittest discover -s tests
 or for individual tests
 
 python -m unittest tests.test_sent2graph
+python -m unittest tests.test_embedder_wordnet
 
 Check for mocking in each test separately 
 

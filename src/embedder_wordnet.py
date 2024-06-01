@@ -1,6 +1,6 @@
 from nltk.corpus import wordnet as wn
 from nltk.tokenize import word_tokenize
-from src.embedder_glove import GLOVE_SIZE
+from src.embedder_glove import GLOVE_SIZE , GloveEmbedder
 import numpy as np
 import nltk
 import gensim.downloader as api
@@ -50,14 +50,14 @@ class MultilingualWordNetEncoder:
 class WordNetGloveEmbedder:
     def __init__(self, language='eng', embedding_model_name='glove-wiki-gigaword-50'):
         self.encoder = MultilingualWordNetEncoder(language)
-        self.embedder = GloveEmbedder(embed_dim=GLOVE_SIZE).embedder
+        self.model = GloveEmbedder(model_name=embedding_model_name).model
 
     def get_word_embedding(self, word):
         """
         Get the embedding for a given word using a pre-trained embedding model.
         """
         try:
-            return self.embedder(word)
+            return self.model[word]
         except KeyError:
             return np.zeros(GLOVE_SIZE)  # Return a zero vector if the word is not in the embedding model
 
