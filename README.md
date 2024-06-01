@@ -6,12 +6,15 @@ It takes in source and machine translated outputs ( along with a reference if av
 It then creates embeddings for these using a variety of methods 
 It also constructs a Graph CNN from the text , trains the GCN to arrive a new set of embeddings
 
+# Addituonal downloads
+python -m spacy download en_core_web_sm
+
 ## Run tests
 python -m unittest discover -s tests
 
 or
+python -m unittest tests.test_sent2graph
 
-python tests/test_text_graph_dataset.py
 
 # Run tests with coverage
 coverage run -m unittest discover -s tests
