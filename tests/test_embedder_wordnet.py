@@ -6,7 +6,7 @@ from src.embedder_wordnet import WordNetGloveEmbedder  # Adjust this import as n
 class TestWordNetGloveEmbedder(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.embedder = WordNetGloveEmbedder(language='eng', embedding_model_name='glove-wiki-gigaword-300')
+        cls.embedder = WordNetGloveEmbedder(language='eng', embedding_model_name='glove-wiki-gigaword-50')
 
     def test_embed_non_empty_sentence(self):
         sentence = "The quick brown fox jumps over the lazy dog"

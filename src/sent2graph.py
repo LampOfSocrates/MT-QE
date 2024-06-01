@@ -5,16 +5,23 @@ import matplotlib.pyplot as plt
 from torch_geometric.data import Data, DataLoader
 from nltk.tokenize import word_tokenize
 import pytorch_lightning as pl
-from src.embedder_glove import GloveEmbedder
+from src.embedder_glove import GloveEmbedder, GLOVE_SIZE
+import numpy as np
+import logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 class Sentence2Graph:
-    def __init__(self, sentences, embedder=GloveEmbedder()):
+    def __init__(self, sentences, embed_dim=GLOVE_SIZE):
         self.sentences = sentences
-        self.embedder = embedder # Initialize the GloveEmbedder
-        print("Starting Space Load")
+        if embed_dim==50:
+            self.embedder = GloveEmbedder(model_name='glove-wiki-gigaword-50')
+        else:
+            self.embedder = GloveEmbedder(model_name='glove-wiki-gigaword-300')
+        logging.info("Starting Space Load")
         self.nlp = spacy.load('en_core_web_sm')
         self.deptree = True
-        print("Loaded Sentence2Graph ")
+        logging.info("Loaded Sentence2Graph ")
         
     def word_to_node_features(self, word):
         return self.embedder.embed(word).float()
@@ -41,7 +48,7 @@ class Sentence2Graph:
         edge_index = torch.tensor(edge_index, dtype=torch.long).t().contiguous()
         node_features = torch.stack(node_features)
         data = Data(x=node_features, edge_index=edge_index)
-        return data
+        return data, doc
 
     def visualize_graph(self, sentence):
         data, doc = self.sentence_to_graph(sentence)
@@ -77,7 +84,7 @@ class Sentence2Graph:
         print(adj_matrix)
 
     def get_data(self):
-        return [self.sentence_to_graph(sentence) for sentence in self.sentences]
+        return [self.sentence_to_graph(sentence)[0] for sentence in self.sentences]
 
 class GraphDataModule(pl.LightningDataModule):
     def __init__(self, sentences, batch_size=32):
@@ -86,7 +93,7 @@ class GraphDataModule(pl.LightningDataModule):
         self.batch_size = batch_size
 
     def setup(self, stage=None):
-        dataset = Sentence2Graph(self.sentences)
+        dataset = Sentence2Graph(self.sentences, embed_dim=GLOVE_SIZE)
         self.data = dataset.get_data()
 
     def train_dataloader(self):

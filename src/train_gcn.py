@@ -7,10 +7,11 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 import gensim.downloader as api
 from embedder_glove import GloveEmbedder
-from text_graph_dataset import GraphDataModule, Sentence2Graph
+from sent2graph import GraphDataModule, Sentence2Graph
 from gcn import GCN
 from pytorch_lightning.loggers import WandbLogger
 import wandb
+from embedder_glove import GLOVE_SIZE
 
 # Example sentences
 sentences = [
@@ -53,7 +54,7 @@ new_sentences = [
 ]
 
 # Initialize the TextGraphDataset for the new sentences
-dataset = Sentence2Graph(new_sentences)
+dataset = Sentence2Graph(new_sentences, embed_dim=GLOVE_SIZE)
 graph_data_list = dataset.get_data()
 
 # Generate embeddings for new sentences

@@ -1,5 +1,6 @@
 from nltk.corpus import wordnet as wn
 from nltk.tokenize import word_tokenize
+from src.embedder_glove import GLOVE_SIZE
 import numpy as np
 import nltk
 import gensim.downloader as api
@@ -44,20 +45,21 @@ class MultilingualWordNetEncoder:
         synset_features = self.get_synset_features(word)
         return synset_features
 
+
 # TODO use the GloveEmbedder class
 class WordNetGloveEmbedder:
-    def __init__(self, language='eng', embedding_model_name='glove-wiki-gigaword-300'):
+    def __init__(self, language='eng', embedding_model_name='glove-wiki-gigaword-50'):
         self.encoder = MultilingualWordNetEncoder(language)
-        self.embedding_model = api.load(embedding_model_name)
+        self.embedder = GloveEmbedder(embed_dim=GLOVE_SIZE).embedder
 
     def get_word_embedding(self, word):
         """
         Get the embedding for a given word using a pre-trained embedding model.
         """
         try:
-            return self.embedding_model[word]
+            return self.embedder(word)
         except KeyError:
-            return np.zeros(300)  # Return a zero vector if the word is not in the embedding model
+            return np.zeros(GLOVE_SIZE)  # Return a zero vector if the word is not in the embedding model
 
     def embed_synset_features(self, features):
         """
@@ -72,16 +74,16 @@ class WordNetGloveEmbedder:
         if all_embeddings:
             return np.mean(all_embeddings, axis=0)
         else:
-            return np.zeros(300)
+            return np.zeros(GLOVE_SIZE)
 
     def embed_word(self, word):
         synset_features = self.encoder.encode(word)
         if not synset_features:
-            return np.zeros(300)  # Return a zero vector if no synsets are found
+            return np.zeros(GLOVE_SIZE)  # Return a zero vector if no synsets are found
 
         # Aggregate synset feature embeddings
         synset_embeddings = [self.embed_synset_features(features) for features in synset_features]
-        word_embedding = np.mean(synset_embeddings, axis=0) if synset_embeddings else np.zeros(300)
+        word_embedding = np.mean(synset_embeddings, axis=0) if synset_embeddings else np.zeros(GLOVE_SIZE)
         return word_embedding
 
     def embed_sentence(self, sentence):
@@ -89,6 +91,6 @@ class WordNetGloveEmbedder:
         word_embeddings = [self.embed_word(word) for word in words]
 
         # Aggregate word embeddings to form a sentence embedding (e.g., by averaging)
-        sentence_embedding = np.mean(word_embeddings, axis=0) if word_embeddings else np.zeros(300)
+        sentence_embedding = np.mean(word_embeddings, axis=0) if word_embeddings else np.zeros(GLOVE_SIZE)
         return sentence_embedding
 

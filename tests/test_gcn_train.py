@@ -1,13 +1,15 @@
 import unittest
 import torch
 import numpy as np
-from embedder_glove import GloveEmbedder
-from text_graph_dataset import GraphDataModule
+from src.embedder_glove import GloveEmbedder , GLOVE_SIZE
+from src.sent2graph import GraphDataModule
+from src.gcn import GCN
+import pytorch_lightning as pl
 
 class TestTrainGCN(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.embedder = GloveEmbedder(model_name= 'glove-wiki-gigaword-300'   )
+        cls.embedder = GloveEmbedder(model_name= 'glove-wiki-gigaword-50'   )
 
     def test_gcn_training_non_empty_sentence(self):
         sentences = [
@@ -19,7 +21,7 @@ class TestTrainGCN(unittest.TestCase):
         data_module = GraphDataModule(sentences, batch_size=2)
 
         # Initialize the model
-        model = GCN(in_channels=300, hidden_channels=128, out_channels=64)
+        model = GCN(in_channels=GLOVE_SIZE, hidden_channels=128, out_channels=64)
 
         # Initialize the trainer
         trainer = pl.Trainer(max_epochs=1)
