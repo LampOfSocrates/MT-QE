@@ -2,7 +2,7 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint, LearningRateMonitor
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint, LearningRateMonitor , DeviceStatsMonitor
 from callback_gpu import GPUMonitorCallback
 from torchmetrics import MeanAbsoluteError, MeanSquaredError, R2Score
 
@@ -15,6 +15,15 @@ class TranslationQualityModel(pl.LightningModule):
         self.mae = MeanAbsoluteError()
         self.mse = MeanSquaredError()
         self.r2 = R2Score()
+        '''
+        # Define the example input array. Carefully shaped
+        self.example_input_array = (
+            torch.zeros(1, input_dim),  # src_embedding
+            torch.zeros(1, input_dim),  # mt_embedding
+            torch.zeros(1, input_dim)   # ref_embedding
+        )
+        '''
+        
 
     def forward(self, src_embedding, mt_embedding, ref_embedding):
         x = torch.cat((src_embedding, mt_embedding, ref_embedding), dim=1)
@@ -87,7 +96,9 @@ class TranslationQualityModel(pl.LightningModule):
             mode='min'
         )
         lr_monitor = LearningRateMonitor(logging_interval='step')
-        callbacks = [early_stopping, checkpoint_callback, lr_monitor]
+        device_stats = DeviceStatsMonitor()
+
+        callbacks = [early_stopping, checkpoint_callback, lr_monitor, device_stats]
         if torch.cuda.is_available():
             callbacks.append(GPUMonitorCallback())
 
