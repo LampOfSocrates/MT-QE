@@ -10,6 +10,7 @@ import pytorch_lightning as pl
 from lightning.pytorch import  seed_everything
 from lightning.pytorch.callbacks import Callback
 from lightning.pytorch.profilers import AdvancedProfiler
+from lightning.pytorch.loggers import WandbLogger
 
 class PrintCallback(Callback):
     def on_train_start(self, trainer, pl_module):
