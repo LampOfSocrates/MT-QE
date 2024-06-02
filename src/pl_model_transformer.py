@@ -32,6 +32,9 @@ class TranslationQualityModel(pl.LightningModule):
         return x.squeeze(dim=1)  # Ensure output shape is [batch_size]
 
     def training_step(self, batch, batch_idx):
+
+        wandb_logger = self.logger.experiment
+        print(type(wandb_logger)) # TODO use this logger to pump in some data to wanbd
         src_embedding = batch['src_embedding']
         mt_embedding = batch['mt_embedding']
         ref_embedding = batch['ref_embedding']
@@ -71,10 +74,10 @@ class TranslationQualityModel(pl.LightningModule):
         mse = self.mse(output, score)
         r2 = self.r2(output, score)
         
-        self.log('test_loss', loss, batch_size=len(batch['score']), on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log('test_mae', mae, batch_size=len(batch['score']),  on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log('test_mse', mse, batch_size=len(batch['score']), on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log('test_r2', r2, batch_size=len(batch['score']), on_step=False, on_epoch=True, prog_bar=True, logger=True)
+        
+        dct = {"test_loss": loss, "test_mae": mae, "test_mse": mse, "test_r2": r2 }
+        self.log_dict(dct, batch_size=len(batch['score']), on_step=False, on_epoch=True, prog_bar=True, logger=True)
+
         return {"loss": loss, "mae": mae, "mse": mse, "r2": r2}
 
     def configure_optimizers(self):

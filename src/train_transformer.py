@@ -36,6 +36,9 @@ print(model)
 summary = pl.utilities.model_summary.ModelSummary(model, max_depth=2)
 print(summary)
 
+wandb_logger = WandbLogger(project='transformer-text-embeddings-abc')
+
+
 profiler = AdvancedProfiler(dirpath=".", filename="perf_logs")
 
 # Initialize the trainer
@@ -43,13 +46,16 @@ profiler = AdvancedProfiler(dirpath=".", filename="perf_logs")
 trainer = pl.Trainer(max_epochs=1, 
                     accelerator="gpu", 
                     callbacks=model.configure_callbacks(),
+                    logger=wandb_logger,
                     check_val_every_n_epoch=1,
                     profiler=profiler,
                     precision="16-mixed",
                     #fast_dev_run=7,                            # Just run 7 batches 
                     log_every_n_steps=10,                       # Because we are running only 10 batches
-                    limit_train_batches=200, limit_val_batches=50 , limit_test_batches=0.1 #use 10 batches of train and 5 batches of val and 10% of test data
+                    limit_train_batches=20, limit_val_batches=5 , limit_test_batches=0.01 #use 10 batches of train and 5 batches of val and 10% of test data
                     ) 
+
+wandb_logger.watch(model)
 
 # Train the model
 trainer.fit(model, datamodule=data_module)
