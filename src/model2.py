@@ -48,8 +48,18 @@ class TranslationQualityModel(pl.LightningModule):
         return x.squeeze(dim=1)
 
     def training_step(self, batch, batch_idx):
+        
         src, mt, ref, score = batch['src'], batch['mt'], batch['ref'], batch['score']
-        output = self(src, mt, ref)
+        try:
+            output = self(src, mt, ref)
+        except Exception as e:
+            print("Model encountered exception, lets print what it faced")
+            print(batch)
+            print(batch_idx)
+            print("mt", mt)
+            return None
+
+        
         loss = self.criterion(output, score)
         self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
@@ -61,7 +71,7 @@ class TranslationQualityModel(pl.LightningModule):
         mae = self.mae(output, score)
         mse = self.mse(output, score)
         r2 = self.r2(output, score)
-        self.log('val_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('val_loss', loss, on_epoch=True, prog_bar=True, logger=True)
         self.log('val_mae', mae, on_epoch=True, prog_bar=True, logger=True)
         self.log('val_mse', mse, on_epoch=True, prog_bar=True, logger=True)
         self.log('val_r2', r2, on_epoch=True, prog_bar=True, logger=True)
@@ -87,7 +97,7 @@ class TranslationQualityModel(pl.LightningModule):
     def configure_callbacks(self):
         early_stopping = EarlyStopping(
             monitor='val_loss',
-            patience=3,
+            patience=5,
             verbose=True,
             mode='min'
         )
@@ -101,5 +111,5 @@ class TranslationQualityModel(pl.LightningModule):
         lr_monitor = LearningRateMonitor(logging_interval='step')
         device_stats = DeviceStatsMonitor()
 
-        callbacks = [early_stopping, checkpoint_callback, lr_monitor, device_stats]
+        callbacks = [early_stopping, checkpoint_callback, lr_monitor]
         return callbacks

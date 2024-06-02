@@ -1,8 +1,7 @@
 import pandas as pd
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, random_split
 import pytorch_lightning as pl
-from sentence_transformers import SentenceTransformer
 from embedders import TransformerEmbedder
 from embedder_wordnet import WordNetGloveEmbedder
 import pandas as pd
@@ -54,17 +53,26 @@ class EmbeddedLitModule(pl.LightningDataModule):
         
     
     def setup(self, stage=None):
-        self.dataset = EmbeddedDataset(self.file_path, self.embedder)
+        # Load the full dataset
+        full_dataset = EmbeddedDataset(self.file_path, self.embedder)
+        
+        # Calculate lengths for each split
+        train_size = int(0.7 * len(full_dataset))
+        val_size = int(0.15 * len(full_dataset))
+        test_size = len(full_dataset) - train_size - val_size
+        
+        # Split the dataset
+        self.train_dataset, self.val_dataset, self.test_dataset = random_split(full_dataset, [train_size, val_size, test_size])
     
     def train_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True, num_workers=7)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=7)
     
     def val_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size, num_workers=7)
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=7)
     
     def test_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size, num_workers=7)
-
+        return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=7)
+    
 def display_stats(data):
 
     # Compute the unique count of the `lp` field

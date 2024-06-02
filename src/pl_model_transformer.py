@@ -57,10 +57,11 @@ class TranslationQualityModel(pl.LightningModule):
         mae = self.mae(output, score)
         mse = self.mse(output, score)
         r2 = self.r2(output, score)
-        self.log('val_loss', loss, batch_size=len(batch['score']), on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_mae', mae, batch_size=len(batch['score']),  on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_mse', mse, batch_size=len(batch['score']), on_step=False, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_r2', r2, batch_size=len(batch['score']), on_step=False, on_epoch=True, prog_bar=True, logger=True)
+
+        dct = {"val_loss": loss, "val_mae": mae, "val_mse": mse, "val_r2": r2 }
+        self.log_dict(dct, batch_size=len(batch['score']), on_step=False, on_epoch=True, prog_bar=True, logger=True)
+
+
         return {"loss": loss, "mae": mae, "mse": mse, "r2": r2}
 
     def test_step(self, batch, batch_idx):
@@ -102,7 +103,7 @@ class TranslationQualityModel(pl.LightningModule):
         lr_monitor = LearningRateMonitor(logging_interval='step')
         device_stats = DeviceStatsMonitor()
 
-        callbacks = [early_stopping, checkpoint_callback, lr_monitor, device_stats]
+        callbacks = [early_stopping,  lr_monitor]
         if torch.cuda.is_available():
             callbacks.append(GPUMonitorCallback())
 
