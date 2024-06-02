@@ -35,7 +35,7 @@ class TranslationQualityModel(pl.LightningModule):
     def training_step(self, batch, batch_idx):
 
         wandb_logger = self.logger.experiment
-        print(type(wandb_logger)) # TODO use this logger to pump in some data to wanbd
+        #print(type(wandb_logger)) # TODO use this logger to pump in some data to wanbd
         src_embedding = batch['src_embedding']
         mt_embedding = batch['mt_embedding']
         ref_embedding = batch['ref_embedding']

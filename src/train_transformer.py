@@ -1,7 +1,11 @@
 import os
+import wandb
 
 # Disable tokenizers parallelism to avoid deadlocks
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+
+
 
 from embedders import TransformerEmbedder
 from embedded_dataset import EmbeddedLitModule
@@ -36,6 +40,8 @@ model = TranslationQualityModel(input_dim, hidden_dim, output_dim)
 print(model)
 summary = pl.utilities.model_summary.ModelSummary(model, max_depth=2)
 print(summary)
+# Log in to wandb using your API token
+wandb.login(key=os.environ['WANDB_API_KEY'])
 
 wandb_logger = WandbLogger(project='transformer-text-embeddings-abc')
 
