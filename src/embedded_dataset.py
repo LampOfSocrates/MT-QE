@@ -3,12 +3,12 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import pytorch_lightning as pl
 from sentence_transformers import SentenceTransformer
-from embedders import *
-from embedder_wordnet import WordNetGloveEmbedder
+from .embedders import TransformerEmbedder
+from .embedder_wordnet import WordNetGloveEmbedder
 import pandas as pd
 from torch.utils.data import Dataset
 
-class CustomDataset(Dataset):
+class EmbeddedDataset(Dataset):
     def __init__(self, file_path, embedder):
         self.data = pd.read_csv(file_path)
         self.encoder = encoder
@@ -45,7 +45,7 @@ class CustomDataset(Dataset):
         
         return sample
 
-class CustomDataModule(pl.LightningDataModule):
+class EmbeddedLitModule(pl.LightningDataModule):
     def __init__(self, file_path, encoder, batch_size=32):
         super().__init__()
         self.file_path = file_path
@@ -54,7 +54,7 @@ class CustomDataModule(pl.LightningDataModule):
         
     
     def setup(self, stage=None):
-        self.dataset = CustomDataset(self.file_path, self.embedder)
+        self.dataset = EmbeddedDataset(self.file_path, self.embedder)
     
     def train_dataloader(self):
         return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True)
@@ -131,13 +131,13 @@ def main():
     #fasttext_encoder = FastTextEncoder()
     #use_encoder = USEEncoder()
 
-    # Inject the encoder into the CustomDataset
-    dataset_with_transformer = CustomDataset(file_path, transformer_embedder)
-    dataset_with_wordnet_embeddings = CustomDataset(file_path, wordnet_embeder)
-    #dataset_with_tfidf = CustomDataset(file_path, tfidf_encoder)
-    #dataset_with_word2vec = CustomDataset(file_path, word2vec_encoder)
-    #dataset_with_fasttext = CustomDataset(file_path, fasttext_encoder)
-    #dataset_with_use = CustomDataset(file_path, use_encoder)
+    # Inject the encoder into the EmbeddedDataset
+    dataset_with_transformer = EmbeddedDataset(file_path, transformer_embedder)
+    dataset_with_wordnet_embeddings = EmbeddedDataset(file_path, wordnet_embeder)
+    #dataset_with_tfidf = EmbeddedDataset(file_path, tfidf_encoder)
+    #dataset_with_word2vec = EmbeddedDataset(file_path, word2vec_encoder)
+    #dataset_with_fasttext = EmbeddedDataset(file_path, fasttext_encoder)
+    #dataset_with_use = EmbeddedDataset(file_path, use_encoder)
 
     BATCH_SIZE = 2
     dataloader_with_transformer = DataLoader(dataset_with_transformer, batch_size=BATCH_SIZE, shuffle=True)

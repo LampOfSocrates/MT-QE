@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from torch_geometric.data import Data, DataLoader
 from nltk.tokenize import word_tokenize
 import pytorch_lightning as pl
-from src.embedder_glove import GloveEmbedder, GLOVE_SIZE
+from .embedder_glove import GloveEmbedder, GLOVE_SIZE
 import numpy as np
 import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from src.embedder_glove import GloveEmbedder , GLOVE_SIZE
 from src.sent2graph import GraphDataModule
+from src.embedded_dataset import EmbeddedLitModule
 from src.gcn import GCN
 import pytorch_lightning as pl
 
@@ -28,6 +29,11 @@ class TestTrainGCN(unittest.TestCase):
 
         # Train the model
         trainer.fit(model, data_module)
+
+    def test_transformer_embedded(self):
+
+        #datamodule = EmbeddedLitModule(file_path, encoder, batch_size=32)
+        pass
 
 if __name__ == "__main__":
     unittest.main()

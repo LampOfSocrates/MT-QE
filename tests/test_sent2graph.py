@@ -1,4 +1,4 @@
-from common import measure_import_time
+from src.common import measure_import_time
 
 with measure_import_time('your_module_name'):
     from unittest.mock import MagicMock, patch
