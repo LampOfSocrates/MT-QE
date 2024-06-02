@@ -17,10 +17,14 @@
 
 * Ricardo Rei, Craig Stewart, Ana C Farinha, and Alon Lavie. 2020. COMET: A Neural Framework for MT Evaluation. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP), pages 2685–2702, Online. Association for Computational Linguistics.
 
+# Annotation Methods
+* HTER - computes the translation edit rate TER between mt and pe . 
+
 # Datasets
- * QT21
- * WMT Shared Tasks
- * MT-PE
+ * QT21 - 4 language pairs, 173K tuples of ( src, mt, ref , pe )   - pe means post edited https://lindat.mff.cuni.cz/ repository/xmlui/handle/11372/LRT-2390
+ * WMT Shared Tasks 2023 - 14 language pairs with PE, 17 with DA , 4 with MQM  . raw: http://www.statmt.org/wmt19/results.html 
+ * MLQE-PE 2020 - 11 language Pairs
+ * FLORES 2019 
 
 # Download NLP data
 ## Download Glove Embeddings
