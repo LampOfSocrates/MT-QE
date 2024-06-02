@@ -24,6 +24,7 @@ matplotlib==3.8.2
 nltk==3.8.1
 python-dotenv==1.0.1
 pytorch-lightning==2.2.5
+pynvml==11.5.0
 sacrebleu==2.4.2
 sentence-transformers==3.0.0
 scipy==1.11.4

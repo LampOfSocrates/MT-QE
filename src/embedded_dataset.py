@@ -3,15 +3,15 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import pytorch_lightning as pl
 from sentence_transformers import SentenceTransformer
-from .embedders import TransformerEmbedder
-from .embedder_wordnet import WordNetGloveEmbedder
+from embedders import TransformerEmbedder
+from embedder_wordnet import WordNetGloveEmbedder
 import pandas as pd
 from torch.utils.data import Dataset
 
 class EmbeddedDataset(Dataset):
     def __init__(self, file_path, embedder):
         self.data = pd.read_csv(file_path)
-        self.encoder = encoder
+        self.embedder = embedder
     
     def __len__(self):
         return len(self.data)
@@ -46,7 +46,7 @@ class EmbeddedDataset(Dataset):
         return sample
 
 class EmbeddedLitModule(pl.LightningDataModule):
-    def __init__(self, file_path, encoder, batch_size=32):
+    def __init__(self, file_path, embedder, batch_size=32):
         super().__init__()
         self.file_path = file_path
         self.embedder = embedder
@@ -57,13 +57,13 @@ class EmbeddedLitModule(pl.LightningDataModule):
         self.dataset = EmbeddedDataset(self.file_path, self.embedder)
     
     def train_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True)
+        return DataLoader(self.dataset, batch_size=self.batch_size, shuffle=True, num_workers=7)
     
     def val_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size)
+        return DataLoader(self.dataset, batch_size=self.batch_size, num_workers=7)
     
     def test_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size)
+        return DataLoader(self.dataset, batch_size=self.batch_size, num_workers=7)
 
 def display_stats(data):
 
