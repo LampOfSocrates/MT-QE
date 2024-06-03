@@ -1,9 +1,7 @@
 from nltk.corpus import wordnet as wn
 from nltk.tokenize import word_tokenize
-from embedder_glove import GLOVE_SIZE , GloveEmbedder
+from .embedder_glove import GLOVE_SIZE , GloveEmbedder
 import numpy as np
-import nltk
-import gensim.downloader as api
 
 class MultilingualWordNetEncoder:
     def __init__(self, language='eng'):

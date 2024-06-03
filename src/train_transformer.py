@@ -2,6 +2,7 @@ import os
 import wandb
 import torch 
 
+from common import ROOT_FOLDER
 # Disable tokenizers parallelism to avoid deadlocks
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -45,17 +46,21 @@ model = TranslationQualityModel(input_dim, hidden_dim, output_dim)
 print(model)
 summary = pl.utilities.model_summary.ModelSummary(model, max_depth=2)
 print(summary)
-# Log in to wandb using your API token
 wandb.login(key=os.environ['WANDB_API_KEY'])
+# Set the wandb directory to /tmp/wandb
+os.environ['WANDB_DIR'] = f'{ROOT_FOLDER}/model1/wandb'
+
+# Initialize wandb
+wandb.init(project='model2', dir=os.environ['WANDB_DIR'])
+
 
 wandb_logger = WandbLogger(project='transformer-text-embeddings-heron')
-
-
-profiler = AdvancedProfiler(dirpath=".", filename="perf_logs")
+profiler = AdvancedProfiler(dirpath=f"{ROOT_FOLDER}/model1/profiler", filename="perf_logs")
 
 # Initialize the trainer
 # auto uses gpu if available
-trainer = pl.Trainer(max_epochs=10,
+trainer = pl.Trainer(default_root_dir=f"{ROOT_FOLDER}/model1/",
+                    max_epochs=10,
                     devices=-1,
                     accelerator="gpu", 
                     callbacks=model.configure_callbacks(),

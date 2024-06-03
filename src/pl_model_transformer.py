@@ -6,6 +6,7 @@ from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint, Learning
 
 from callback_gpu import GPUMonitorCallback
 from torchmetrics import MeanAbsoluteError, MeanSquaredError, R2Score
+from common import ROOT_FOLDER
 
 class TranslationQualityModel(pl.LightningModule):
     def __init__(self, input_dim, hidden_dim, output_dim):
@@ -95,15 +96,15 @@ class TranslationQualityModel(pl.LightningModule):
         )
         checkpoint_callback = ModelCheckpoint(
             monitor='val_loss',
-            dirpath='checkpoints',
-            filename='best-checkpoint',
-            save_top_k=1,
+            dirpath=f"{ROOT_FOLDER}/model1/checkpoints", # directory where checkpoints are saved
+            filename="model1-{epoch}-{val_loss:.2f}", # filename pattern
+            save_top_k=3,
             mode='min'
         )
         lr_monitor = LearningRateMonitor(logging_interval='step')
         device_stats = DeviceStatsMonitor()
 
-        callbacks = [early_stopping,  lr_monitor]
+        callbacks = [early_stopping, checkpoint_callback,  lr_monitor]
         if torch.cuda.is_available():
             callbacks.append(GPUMonitorCallback())
 

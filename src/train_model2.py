@@ -10,6 +10,7 @@ from lightning.pytorch.loggers import WandbLogger
 from lightning.pytorch.profilers import AdvancedProfiler, SimpleProfiler
 from lightning.pytorch import  seed_everything
 from pytorch_lightning.strategies import DDPStrategy
+from common import ROOT_FOLDER
 
 class TranslationDataset(Dataset):
     def __init__(self, file_path):
@@ -54,11 +55,18 @@ test_loader = DataLoader(test_dataset, batch_size=4, num_workers=2)
 model = TranslationQualityModel()
 
 wandb.login(key=os.environ['WANDB_API_KEY'])
+# Set the wandb directory to /tmp/wandb
+os.environ['WANDB_DIR'] = f'{ROOT_FOLDER}/model2/wandb'
 
-wandb_logger = WandbLogger(project='transformer-text-embeddings-heron')
-profiler = SimpleProfiler(dirpath=".", filename="perf_logs")
+# Initialize wandb
+wandb.init(project='model2', dir=os.environ['WANDB_DIR'])
 
-trainer = pl.Trainer(accelerator='gpu', 
+
+wandb_logger = WandbLogger(project='model2-text-embeddings-heron')
+profiler = SimpleProfiler(dirpath=f"{ROOT_FOLDER}/model2/profiler", filename="perf_logs")
+
+trainer = pl.Trainer(default_root_dir=f"{ROOT_FOLDER}/model2/", 
+                     accelerator='gpu', 
                      devices=-1, 
                      #strategy=DDPStrategy(find_unused_parameters=False),
                      #num_nodes=2,  # Number of machines (nodes)

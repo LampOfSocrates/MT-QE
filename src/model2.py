@@ -6,6 +6,10 @@ from transformers import BertModel, BertTokenizer
 from torchmetrics import MeanAbsoluteError, MeanSquaredError, R2Score
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.callbacks.device_stats_monitor import DeviceStatsMonitor
+import json 
+import datetime
+import os 
+from common import ROOT_FOLDER
 
 class TranslationQualityModel(pl.LightningModule):
     def __init__(self, model_name='bert-base-uncased', hidden_dim=128, output_dim=1, learning_rate=0.001):
@@ -53,8 +57,8 @@ class TranslationQualityModel(pl.LightningModule):
         try:
             output = self(src, mt, ref)
         except Exception as e:
-            print("Model encountered exception, lets print what it faced")
-            print(batch)
+            print("Model encountered exception while training, lets print what it faced")
+            save_dict_to_json_file(batch, './data')
             print(batch_idx)
             print("mt", mt)
             return None
@@ -66,28 +70,40 @@ class TranslationQualityModel(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         src, mt, ref, score = batch['src'], batch['mt'], batch['ref'], batch['score']
-        output = self(src, mt, ref)
+        try:
+            output = self(src, mt, ref)
+        except Exception as e:
+            print("Model encountered exception while training, lets print what it faced")
+            save_dict_to_json_file(batch, './data')
+            print(batch_idx)
+            print("mt", mt)
+            return None
+
         loss = self.criterion(output, score)
         mae = self.mae(output, score)
         mse = self.mse(output, score)
         r2 = self.r2(output, score)
-        self.log('val_loss', loss, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_mae', mae, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_mse', mse, on_epoch=True, prog_bar=True, logger=True)
-        self.log('val_r2', r2, on_epoch=True, prog_bar=True, logger=True)
+        
+        self.log_dict({'val_loss': loss , 'val_mae' : mae , 'val_mse': mse, 'val_r2': r2}, on_epoch=True, prog_bar=True, logger=True)
         return {"val_loss": loss, "val_mae": mae, "val_mse": mse, "val_r2": r2}
 
     def test_step(self, batch, batch_idx):
         src, mt, ref, score = batch['src'], batch['mt'], batch['ref'], batch['score']
-        output = self(src, mt, ref)
+        try:
+            output = self(src, mt, ref)
+        except Exception as e:
+            print("Model encountered exception while training, lets print what it faced")
+            save_dict_to_json_file(batch, './data')
+            print(batch_idx)
+            print("mt", mt)
+            return None
+
         loss = self.criterion(output, score)
         mae = self.mae(output, score)
         mse = self.mse(output, score)
         r2 = self.r2(output, score)
-        self.log('test_loss', loss, on_epoch=True, prog_bar=True, logger=True)
-        self.log('test_mae', mae, on_epoch=True, prog_bar=True, logger=True)
-        self.log('test_mse', mse, on_epoch=True, prog_bar=True, logger=True)
-        self.log('test_r2', r2, on_epoch=True, prog_bar=True, logger=True)
+        self.log_dict({'test_loss': loss , 'test_mae' : mae , 'test_mse': mse, 'test_r2': r2}, on_epoch=True, prog_bar=True, logger=True)
+        
         return {"test_loss": loss, "test_mae": mae, "test_mse": mse, "test_r2": r2}
 
     def configure_optimizers(self):
@@ -103,13 +119,45 @@ class TranslationQualityModel(pl.LightningModule):
         )
         checkpoint_callback = ModelCheckpoint(
             monitor='val_loss',
-            dirpath='checkpoints',
-            filename='best-checkpoint',
-            save_top_k=1,
+            dirpath=f"{ROOT_FOLDER}/model2/checkpoints", # directory where checkpoints are saved
+            filename="model2-{epoch}-{val_loss:.2f}", # filename pattern
+            save_top_k=3,
             mode='min'
         )
         lr_monitor = LearningRateMonitor(logging_interval='step')
         device_stats = DeviceStatsMonitor()
 
-        callbacks = [early_stopping, checkpoint_callback, lr_monitor]
+        callbacks = [early_stopping,  checkpoint_callback, lr_monitor]
         return callbacks
+
+def save_dict_to_json_file(data_dict, directory="."):
+    # Get the current datetime
+    current_datetime = datetime.datetime.now()
+    
+    # Format the datetime as YYMMDD_HHMM
+    filename = current_datetime.strftime("%y%m%d_%H%M.json")
+    
+    # Construct the full file path
+    file_path = os.path.join(directory, filename)
+    
+    # Initialize the list to store data
+    data_list = []
+    
+    # Check if the file already exists
+    if os.path.exists(file_path):
+        # Read the existing data
+        with open(file_path, 'r') as file:
+            try:
+                data_list = json.load(file)
+            except json.JSONDecodeError:
+                # If the file is empty or invalid, start with an empty list
+                data_list = []
+    
+    # Append the new dictionary to the list
+    data_list.append(data_dict)
+    
+    # Write the updated list to the JSON file
+    with open(file_path, 'w') as file:
+        json.dump(data_list, file, indent=4)
+    
+    print(f"Dictionary appended to {file_path}")

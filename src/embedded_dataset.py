@@ -2,8 +2,8 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 import pytorch_lightning as pl
-from embedders import TransformerEmbedder
-from embedder_wordnet import WordNetGloveEmbedder
+from .embedders import TransformerEmbedder
+from .embedder_wordnet import WordNetGloveEmbedder
 import pandas as pd
 from torch.utils.data import Dataset
 
