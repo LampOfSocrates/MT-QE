@@ -64,3 +64,10 @@ coverage html
 Here Github Actions pumps the test coverage to a site
 
 [![Coverage Status](https://coveralls.io/repos/github/LampOfSocrates/MT-QE/badge.svg?branch=main)](https://coveralls.io/github/LampOfSocrates/MT-QE?branch=main)
+
+## TODO
+1) Pad and align tokens 
+2) Check tokenization quality per language
+3) Instead of concat 3 input sets of token , apply COMET like operations
+4) record the difference between src+mt+ref vs mt-ref in terms of regression score
+5) Train only specific language pairs

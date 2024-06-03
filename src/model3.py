@@ -2,13 +2,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import pytorch_lightning as pl
-from transformers import BertModel, BertTokenizer
+from transformers import AutoTokenizer, AutoModel
+
 from torchmetrics import MeanAbsoluteError, MeanSquaredError, R2Score
 from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.callbacks.device_stats_monitor import DeviceStatsMonitor
-import json 
-import datetime
-import os 
+
 from common import ROOT_FOLDER , save_errdata_to_file
 
 class TranslationQualityModel(pl.LightningModule):
@@ -21,10 +20,10 @@ class TranslationQualityModel(pl.LightningModule):
         self.learning_rate = learning_rate
 
         # Load BERT model and tokenizer
-        self.tokenizer = BertTokenizer.from_pretrained(model_name)
-        self.backbone = BertModel.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.backbone = AutoModel.from_pretrained(model_name)
 
-        # Regression head
+        # Regression head. We are passing src/mt/ref and so input id 768 x 3 .where 768 represents the sentence embedding that is getting learned.
         self.fc1 = nn.Linear(self.backbone.config.hidden_size * 3, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, output_dim)
         
@@ -35,6 +34,7 @@ class TranslationQualityModel(pl.LightningModule):
         self.r2 = R2Score()
 
     def forward(self, src, mt, ref):
+        ''' Here we just concatenate the embeddings'''
         # Tokenize input sequences
         src_tokens = self.tokenizer(src, return_tensors='pt', padding=True, truncation=True).to(self.device)
         mt_tokens = self.tokenizer(mt, return_tensors='pt', padding=True, truncation=True).to(self.device)
@@ -45,8 +45,9 @@ class TranslationQualityModel(pl.LightningModule):
         mt_embedding = self.backbone(**mt_tokens).last_hidden_state[:, 0, :]
         ref_embedding = self.backbone(**ref_tokens).last_hidden_state[:, 0, :]
 
-        # Concatenate embeddings and pass through regression head
+        # Concatenate embeddings and pass through regression head. Could there we better ways to do this ???? 
         x = torch.cat((src_embedding, mt_embedding, ref_embedding), dim=1)
+
         x = torch.relu(self.fc1(x))
         x = self.fc2(x)
         return x.squeeze(dim=1)

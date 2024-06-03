@@ -2,15 +2,42 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
 import pytorch_lightning as pl
-from .embedders import TransformerEmbedder
-from .embedder_wordnet import WordNetGloveEmbedder
+from embedders import TransformerEmbedder
+from embedder_wordnet import WordNetGloveEmbedder
 import pandas as pd
 from torch.utils.data import Dataset
+from eda import display_stats
 
 class EmbeddedDataset(Dataset):
-    def __init__(self, file_path, embedder):
+    def __init__(self, file_path, embedder , max_words_in_sentence=50) :
         self.data = pd.read_csv(file_path)
         self.embedder = embedder
+        self.clean_data(max_words_in_sentence)
+
+    def clean_data(self, max_words_in_sentence=50):
+        ''' So in the WMT2022, we have at least 1 sample where the MT is nan . So we filter for nans
+            Secondly during eda we found that 90% of the data has less than 50 words , 99% of the data has than 100 words
+            So we normally work with smaller number of words in each sentence
+            This translates into into less tokens for sentence and eventually much faster speed of training 
+            than the whole dataset sceanrio where we pad everything up to 233 tokens each 
+        '''
+        data = self.data
+        print(data.shape)
+        data = data.dropna(subset=['src','mt', 'ref'])
+        print(data.shape)
+        def compute_length(text):
+            if pd.isna(text):
+                return 0
+            return len(text.split()) 
+
+        # Compute lengths of `src`, `mt`, and `ref` fields
+        data['src_length'] = data['src'].apply(compute_length)
+        data['mt_length'] = data['mt'].apply(compute_length)
+        data['ref_length'] = data['ref'].apply(compute_length)
+        data['max_length'] = data[['src_length', 'mt_length', 'ref_length']].max(axis=1)  # Longest sentence we have across src , mt and ref 
+        data = data[data.max_length < max_words_in_sentence]
+        print(data.shape)
+        self.data = data
     
     def __len__(self):
         return len(self.data)
@@ -73,59 +100,7 @@ class EmbeddedLitModule(pl.LightningDataModule):
     def test_dataloader(self):
         return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=7)
     
-def display_stats(data):
 
-    # Compute the unique count of the `lp` field
-    unique_lp_count = data['lp'].nunique()
-
-    print(data.head(2))
-
-    # Function to compute the length of text
-    def compute_length(text):
-        if pd.isna(text):
-            return 0
-        return len(text.split()) 
-
-    # Compute lengths of `src`, `mt`, and `ref` fields
-    data['src_length'] = data['src'].apply(compute_length)
-    data['mt_length'] = data['mt'].apply(compute_length)
-    data['ref_length'] = data['ref'].apply(compute_length)
-
-    # Group by `lp` field and calculate required statistics
-    grouped = data.groupby('lp').agg({
-        'src_length': ['count', 'min', 'max', 'mean'],
-        'mt_length': ['min', 'max', 'mean'],
-        'ref_length': ['min', 'max', 'mean'],
-        'annotators': 'mean',
-        'raw': 'mean'
-    }).reset_index()
-
-    # Flatten the column names
-    grouped.columns = ['_'.join(col).strip() for col in grouped.columns.values]
-
-    # Rename columns for clarity
-    grouped.rename(columns={
-        'lp_': 'lp',
-        'src_length_min': 'src_min_length',
-        'src_length_max': 'src_max_length',
-        'src_length_mean': 'src_avg_length',
-        'mt_length_min': 'mt_min_length',
-        'mt_length_max': 'mt_max_length',
-        'mt_length_mean': 'mt_avg_length',
-        'ref_length_min': 'ref_min_length',
-        'ref_length_max': 'ref_max_length',
-        'ref_length_mean': 'ref_avg_length',
-        'annotators_mean': 'avg_annotators',
-        'raw_mean': 'avg_raw_score'
-    }, inplace=True)
-
-    # Print the results
-    print(f'Unique count of `lp` field: {unique_lp_count}')
-    print(grouped)
-
-    # Display the dataframe in a readable format
-    with pd.option_context('display.max_columns', None, 'display.expand_frame_repr', True):
-        print(grouped)
 
 def main():
 # Example usage:

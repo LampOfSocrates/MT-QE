@@ -10,7 +10,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 from embedders import TransformerEmbedder
-from embedded_dataset import EmbeddedLitModule
+from src.dat_wmt_embedded import EmbeddedLitModule
 from pl_model_transformer import TranslationQualityModel
 import pytorch_lightning as pl
 from lightning.pytorch import  seed_everything
@@ -80,3 +80,4 @@ trainer.fit(model, datamodule=data_module)
 
 # Optionally test the model
 trainer.test(model, datamodule=data_module)
+wandb.finish()
