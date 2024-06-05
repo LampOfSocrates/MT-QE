@@ -4,8 +4,13 @@ import pandas as pd
 
 
 class TranslationDataset(Dataset):
-    def __init__(self, file_path, max_words_in_sentence=50):
+    def __init__(self, file_path, max_words_in_sentence=50, lp=None):
+        """
+            lp=None means work with all lps 
+        """
         self.data = pd.read_csv(file_path)
+        if lp:
+            self.data = self.data[self.data.lp == lp]
         self.clean_data(max_words_in_sentence=max_words_in_sentence)
 
     def clean_data(self, max_words_in_sentence=50):
@@ -42,5 +47,5 @@ class TranslationDataset(Dataset):
             'src': row['src'],
             'mt': row['mt'],
             'ref': row['ref'],
-            'score': torch.tensor(row['score'], dtype=torch.float)
+            'score': torch.tensor(row['score'], dtype=torch.float16)
         }

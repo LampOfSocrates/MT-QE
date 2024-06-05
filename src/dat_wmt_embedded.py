@@ -9,8 +9,10 @@ from torch.utils.data import Dataset
 from eda import display_stats
 
 class EmbeddedDataset(Dataset):
-    def __init__(self, file_path, embedder , max_words_in_sentence=50) :
+    def __init__(self, file_path, embedder , max_words_in_sentence=50, lp=None) :
         self.data = pd.read_csv(file_path)
+        if lp:
+            self.data = self.data[self.data == lp]
         self.embedder = embedder
         self.clean_data(max_words_in_sentence)
 

@@ -7,3 +7,4 @@ lightning_logs/*
 checkpoints/*
 wandb/
 .coverage
+src/.ipynb_checkpoints/*
